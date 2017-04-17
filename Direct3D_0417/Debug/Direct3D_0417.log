@@ -1,0 +1,4 @@
+﻿  Game.cpp
+c:\users\s162193\desktop\direct3d_0417\direct3d_0417\game.cpp(61): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+  Direct3D_0417.vcxproj -> C:\Users\s162193\Desktop\Direct3D_0417\Debug\Direct3D_0417.exe
+  Direct3D_0417.vcxproj -> C:\Users\s162193\Desktop\Direct3D_0417\Debug\Direct3D_0417.pdb (Full PDB)
