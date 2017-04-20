@@ -5,7 +5,12 @@
 #pragma once
 
 #include "StepTimer.h"
-
+#include <PrimitiveBatch.h>		//プリミティブバッチクラスのためのヘッダ
+#include <VertexTypes.h>		//Vertex系を使うためのヘッダ
+#include <Effects.h>			//エフェクトを使うためのヘッダ
+#include <CommonStates.h>		//コモンステイとを使うためのヘッダ
+#include <SimpleMath.h>			//Vector,Colorを使うためのヘッダ
+#include "DebugCamera.h"
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -62,4 +67,26 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
+
+	//VertexPositonColor -> 頂点に位置と色を持たせる
+	//PrimitiveBatch -> 指定した頂点のデータを使って図形を描く
+	//unique_ptr -> スマートポインタの一つ、メモリの所有者が一人(複数の人が使いまわさない)
+	//プリミティブバッチ
+	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionNormal>> m_batch;
+	//エフェクト
+	std::unique_ptr<DirectX::BasicEffect> m_effect;
+	//入力レイアウト
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+	//汎用ステート設定
+	std::unique_ptr<DirectX::CommonStates> m_states;
+
+	//ワールド行列
+	DirectX::SimpleMath::Matrix m_world;
+	//ビュー行列
+	DirectX::SimpleMath::Matrix m_view;
+	//プロジェクション行列
+	DirectX::SimpleMath::Matrix m_proj;
+
+	//デバッグカメラ
+	std::unique_ptr<DebugCamera> m_debug_camera;
 };
