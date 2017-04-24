@@ -1,4 +1,8 @@
-﻿  Game.cpp
+﻿  Assets\ground_1m.FBX
+  Assets\skydome.FBX
+  Main.cpp
+  Game.cpp
 c:\users\s162193\desktop\directenginetk\direct3d_0417\game.cpp(51): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+  コードを生成中...
   Direct3D_0417.vcxproj -> C:\Users\s162193\Desktop\DirectEngineTK\Debug\Direct3D_0417.exe
   Direct3D_0417.vcxproj -> C:\Users\s162193\Desktop\DirectEngineTK\Debug\Direct3D_0417.pdb (Full PDB)

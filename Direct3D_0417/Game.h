@@ -10,7 +10,9 @@
 #include <Effects.h>			//エフェクトを使うためのヘッダ
 #include <CommonStates.h>		//コモンステイとを使うためのヘッダ
 #include <SimpleMath.h>			//Vector,Colorを使うためのヘッダ
+#include <Model.h>				//モデルを表示するためのヘッダ
 #include "DebugCamera.h"
+
 
 // A basic game implementation that creates a D3D11 device and
 // provides a game loop.
@@ -89,4 +91,12 @@ private:
 
 	//デバッグカメラ
 	std::unique_ptr<DebugCamera> m_debug_camera;
+
+	//エフェクトファクトリ
+	std::unique_ptr<DirectX::EffectFactory> m_factory;
+
+	//地面モデル
+	std::unique_ptr<DirectX::Model> m_model_ground;
+	//天球モデル
+	std::unique_ptr<DirectX::Model> m_model_skydome;
 };

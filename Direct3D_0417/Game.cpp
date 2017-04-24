@@ -66,6 +66,13 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//デバッグカメラを生成
 	m_debug_camera = std::make_unique<DebugCamera>(m_outputHeight, m_outputWidth);
+
+	//エフェクトファクトリ生成
+	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	m_factory->SetDirectory(L"Resources");	//テクスチャのパスを指定(フォルダ名を指定)
+	//モデルの生成(引数は　デバイス、読み込むcmo、エフェクトファクトリ(実体))
+	m_model_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_1m.cmo", *m_factory);
+	m_model_skydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\skydome.cmo", *m_factory);
 }
 
 // Executes the basic game loop.
@@ -137,7 +144,7 @@ void Game::Render()
 		XM_PI / 4.f,		//視野角(上下方向)	(カメラの直線からの角度)
 		float(m_outputWidth) / float(m_outputHeight),	//アスペクト比
 		0.1f,			//ニアクリップ		-> 描画する範囲(カメラからの距離)
-		10.f);			//ファークリップ	-> 描画する範囲(カメラからの距離)
+		200.0f);			//ファークリップ	-> 描画する範囲(カメラからの距離)
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
@@ -146,6 +153,10 @@ void Game::Render()
 	//上の設定を反映する
 	m_effect->Apply(m_d3dContext.Get());
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
+
+	//モデルの描画(引数は　コンテキスト、コモンステート(実体)、ワールド行列、ビュー行列、射影行列)
+	m_model_ground->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_model_skydome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
 
 	m_batch->Begin();
 	m_batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
