@@ -39,6 +39,10 @@ public:
     void GetDefaultSize( int& width, int& height ) const;
 
 private:
+	const int BALL_NUM = 20;
+	const int GROUND_NUM = 40000;
+	const int COUNT_NUM = 360 * 60;
+
 
     void Update(DX::StepTimer const& timer);
     void Render();
@@ -96,7 +100,16 @@ private:
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 
 	//地面モデル
-	std::unique_ptr<DirectX::Model> m_model_ground;
+	std::unique_ptr<DirectX::Model> m_model_ground[40000];
 	//天球モデル
 	std::unique_ptr<DirectX::Model> m_model_skydome;
+	//ボールモデル
+	std::unique_ptr<DirectX::Model> m_model_ball[20];
+	//球のワールド行列
+	DirectX::SimpleMath::Matrix m_worldBall;
+	DirectX::SimpleMath::Matrix m_worldGround;
+
+	int count;
+
+	
 };

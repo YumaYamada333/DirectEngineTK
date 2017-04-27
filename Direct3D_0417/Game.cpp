@@ -1,4 +1,4 @@
-//
+ï»¿//
 // Game.cpp
 //
 
@@ -13,7 +13,7 @@ using namespace DirectX::SimpleMath;
 
 using Microsoft::WRL::ComPtr;
 
-//ƒOƒ[ƒoƒ‹•Ï”
+//ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼ï¼
 
 Game::Game() :
     m_window(0),
@@ -40,13 +40,13 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetFixedTimeStep(true);
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
-	//‰Šú‰»‚Í‚±‚±‚É‘‚­
-	//ˆø”‚Æ‚µ‚Ä‚»‚Ì‚Ü‚Ü‚Ìƒ|ƒCƒ“ƒ^‚ğ—v‹‚³‚ê‚Ä‚¢‚éê‡AƒXƒ}[ƒgƒ|ƒCƒ“ƒ^.Get()‚ÆŠÖ”‚ğŒÄ‚Ño‚·‚Æ‰B‚³‚ê‚½ƒ|ƒCƒ“ƒ^‚ª•Ô‚Á‚Ä‚­‚é
+	//åˆæœŸåŒ–ã¯ã“ã“ã«æ›¸ã
+	//å¼•æ•°ã¨ã—ã¦ãã®ã¾ã¾ã®ãƒã‚¤ãƒ³ã‚¿ã‚’è¦æ±‚ã•ã‚Œã¦ã„ã‚‹å ´åˆã€ã‚¹ãƒãƒ¼ãƒˆãƒã‚¤ãƒ³ã‚¿.Get()ã¨é–¢æ•°ã‚’å‘¼ã³å‡ºã™ã¨éš ã•ã‚ŒãŸãƒã‚¤ãƒ³ã‚¿ãŒè¿”ã£ã¦ãã‚‹
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
 	m_effect = std::make_unique<BasicEffect>(m_d3dDevice.Get());
 
-	//Ë‰es—ñ
+	//å°„å½±è¡Œåˆ—
 	m_effect->SetProjection(XMMatrixOrthographicOffCenterRH(0,
 		m_outputWidth, m_outputHeight, 0, 0, 1));
 	m_effect->SetVertexColorEnabled(true);
@@ -61,18 +61,29 @@ void Game::Initialize(HWND window, int width, int height)
 		shaderByteCode, byteCodeLength,
 		m_inputLayout.GetAddressOf());
 
-	//”Ä—pƒXƒe[ƒgİ’è‚ğ¶¬
+	//æ±ç”¨ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®šã‚’ç”Ÿæˆ
 	m_states = std::make_unique<CommonStates>(m_d3dDevice.Get());
 
-	//ƒfƒoƒbƒOƒJƒƒ‰‚ğ¶¬
+	//ãƒ‡ãƒãƒƒã‚°ã‚«ãƒ¡ãƒ©ã‚’ç”Ÿæˆ
 	m_debug_camera = std::make_unique<DebugCamera>(m_outputHeight, m_outputWidth);
 
-	//ƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ¶¬
+	//ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒªç”Ÿæˆ
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
-	m_factory->SetDirectory(L"Resources");	//ƒeƒNƒXƒ`ƒƒ‚ÌƒpƒX‚ğw’è(ƒtƒHƒ‹ƒ_–¼‚ğw’è)
-	//ƒ‚ƒfƒ‹‚Ì¶¬(ˆø”‚Í@ƒfƒoƒCƒXA“Ç‚İ‚ŞcmoAƒGƒtƒFƒNƒgƒtƒ@ƒNƒgƒŠ(À‘Ì))
-	m_model_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_1m.cmo", *m_factory);
+	m_factory->SetDirectory(L"Resources");	//ãƒ†ã‚¯ã‚¹ãƒãƒ£ã®ãƒ‘ã‚¹ã‚’æŒ‡å®š(ãƒ•ã‚©ãƒ«ãƒ€åã‚’æŒ‡å®š)
+	//ãƒ¢ãƒ‡ãƒ«ã®ç”Ÿæˆ(å¼•æ•°ã¯ã€€ãƒ‡ãƒã‚¤ã‚¹ã€èª­ã¿è¾¼ã‚€cmoã€ã‚¨ãƒ•ã‚§ã‚¯ãƒˆãƒ•ã‚¡ã‚¯ãƒˆãƒª(å®Ÿä½“))
+	for (int i = 0; i < GROUND_NUM; i++)
+	{
+		m_model_ground[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_1m.cmo", *m_factory);
+	}
 	m_model_skydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\skydome.cmo", *m_factory);
+	for (int i = 0; i < BALL_NUM; i++)
+	{
+		m_model_ball[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ball.cmo", *m_factory);
+	}
+
+	m_worldBall = Matrix::Identity;
+
+	count = 0;
 }
 
 // Executes the basic game loop.
@@ -89,13 +100,41 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
+
     float elapsedTime = float(timer.GetElapsedSeconds());
 
     // TODO: Add your game logic here.
     elapsedTime;
-	//–ˆƒtƒŒ[ƒ€ˆ—‚ğ‘‚­
+	//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ å‡¦ç†ã‚’æ›¸ã
+	count++;
+
+	if (count > COUNT_NUM)
+	{
+		count = 0;
+	}
 
 	m_debug_camera->Update();
+
+	//ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã‚’è¨ˆç®—
+	////ã‚¹ã‚±ãƒ¼ãƒªãƒ³ã‚°
+	//Matrix scalemat = Matrix::CreateScale(2.0f);
+
+	////ãƒ­ãƒ¼ãƒ«
+	//Matrix rotmatZ = Matrix::CreateRotationZ(1.57f);
+	////ãƒ”ãƒƒãƒï¼ˆä»°è§’ï¼‰
+	//Matrix rotmatX = Matrix::CreateRotationX(1.57f);
+	////ãƒ¨ãƒ¼(æ–¹ä½è§’)
+	//Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(15.0f));
+	////å›è»¢è¡Œåˆ—ã®åˆæˆ
+	//Matrix rotmat = rotmatZ * rotmatX * rotmatY;
+
+	////å¹³è¡Œç§»å‹•
+	//Matrix transmat = Matrix::CreateTranslation(20.0f, 0.0f, 0.0f);
+
+	////ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã®åˆæˆ
+	//m_worldBall = scalemat * transmat * rotmat;
+
+	//m_worldBall = rotmatX;
 }
 
 // Draws the scene.
@@ -124,39 +163,63 @@ void Game::Render()
     Clear();
 
     // TODO: Add your rendering code here.
-	//•`‰æˆ—‚ğ‘‚­
+	//æç”»å‡¦ç†ã‚’æ›¸ã
 	
-	//ƒIƒy[ƒN -> •s“§–¾“xİ’è
+	//ã‚ªãƒšãƒ¼ã‚¯ -> ä¸é€æ˜åº¦è¨­å®š
 	m_d3dContext->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
-	//DepthNone() -> ‰œsî•ñ(ƒfƒvƒXƒoƒbƒtƒ@)‚Íg‚í‚È‚¢
+	//DepthNone() -> å¥¥è¡Œæƒ…å ±(ãƒ‡ãƒ—ã‚¹ãƒãƒƒãƒ•ã‚¡)ã¯ä½¿ã‚ãªã„
 	m_d3dContext->OMSetDepthStencilState(m_states->DepthNone(), 0);
-	//CullNone() -> ƒJƒŠƒ“ƒO(•\— )‚ğ”½‰f‚µ‚È‚¢
+	//CullNone() -> ã‚«ãƒªãƒ³ã‚°(è¡¨è£)ã‚’åæ˜ ã—ãªã„
 	m_d3dContext->RSSetState(m_states->CullNone());
 
-	//ƒrƒ…[s—ñ‚ğ¶¬
+	//ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã‚’ç”Ÿæˆ
 	//m_view = Matrix::CreateLookAt(
-	//	Vector3(0.f, 0.f, 20.f),		//ƒJƒƒ‰‚ÌÀ•W
-	//	Vector3::Zero,				//ƒJƒƒ‰‚Ì’‹“_
-	//	Vector3::UnitY);			//ã•ûŒüƒxƒNƒgƒ‹(‰æ–Ê‚Ìã•ûŒü‚ªƒ[ƒ‹ƒh‚Ì‚Ç‚±‚É‚È‚é‚©‚ğŒˆ’è‚·‚é)
+	//	Vector3(0.f, 0.f, 20.f),		//ã‚«ãƒ¡ãƒ©ã®åº§æ¨™
+	//	Vector3::Zero,				//ã‚«ãƒ¡ãƒ©ã®æ³¨è¦–ç‚¹
+	//	Vector3::UnitY);			//ä¸Šæ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«(ç”»é¢ã®ä¸Šæ–¹å‘ãŒãƒ¯ãƒ¼ãƒ«ãƒ‰ã®ã©ã“ã«ãªã‚‹ã‹ã‚’æ±ºå®šã™ã‚‹)
 	m_view = m_debug_camera->GetCameraMatrix();
-	//ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ‚ğ¶¬(‰“‹ß–@‚ğ‰Á–¡‚µ‚½‰æ–Ê‚Ì•`‰æ)
+	//ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—ã‚’ç”Ÿæˆ(é è¿‘æ³•ã‚’åŠ å‘³ã—ãŸç”»é¢ã®æç”»)
 	m_proj = Matrix::CreatePerspectiveFieldOfView(
-		XM_PI / 4.f,		//‹–ìŠp(ã‰º•ûŒü)	(ƒJƒƒ‰‚Ì’¼ü‚©‚ç‚ÌŠp“x)
-		float(m_outputWidth) / float(m_outputHeight),	//ƒAƒXƒyƒNƒg”ä
-		0.1f,			//ƒjƒAƒNƒŠƒbƒv		-> •`‰æ‚·‚é”ÍˆÍ(ƒJƒƒ‰‚©‚ç‚Ì‹——£)
-		200.0f);			//ƒtƒ@[ƒNƒŠƒbƒv	-> •`‰æ‚·‚é”ÍˆÍ(ƒJƒƒ‰‚©‚ç‚Ì‹——£)
+		XM_PI / 4.f,		//è¦–é‡è§’(ä¸Šä¸‹æ–¹å‘)	(ã‚«ãƒ¡ãƒ©ã®ç›´ç·šã‹ã‚‰ã®è§’åº¦)
+		float(m_outputWidth) / float(m_outputHeight),	//ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”
+		0.1f,			//ãƒ‹ã‚¢ã‚¯ãƒªãƒƒãƒ—		-> æç”»ã™ã‚‹ç¯„å›²(ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®è·é›¢)
+		200.0f);			//ãƒ•ã‚¡ãƒ¼ã‚¯ãƒªãƒƒãƒ—	-> æç”»ã™ã‚‹ç¯„å›²(ã‚«ãƒ¡ãƒ©ã‹ã‚‰ã®è·é›¢)
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
 
 
-	//ã‚Ìİ’è‚ğ”½‰f‚·‚é
+	//ä¸Šã®è¨­å®šã‚’åæ˜ ã™ã‚‹
 	m_effect->Apply(m_d3dContext.Get());
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
-	//ƒ‚ƒfƒ‹‚Ì•`‰æ(ˆø”‚Í@ƒRƒ“ƒeƒLƒXƒgAƒRƒ‚ƒ“ƒXƒe[ƒg(À‘Ì)Aƒ[ƒ‹ƒhs—ñAƒrƒ…[s—ñAË‰es—ñ)
-	m_model_ground->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
-	m_model_skydome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	//ãƒ¢ãƒ‡ãƒ«ã®æç”»(å¼•æ•°ã¯ã€€ã‚³ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã€ã‚³ãƒ¢ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆ(å®Ÿä½“)ã€ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—ã€ãƒ“ãƒ¥ãƒ¼è¡Œåˆ—ã€å°„å½±è¡Œåˆ—)
+	//m_model_ground->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	//m_model_skydome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	//ãƒœãƒ¼ãƒ«ã®æç”»
+	for (int i = 0; i < BALL_NUM; i++)
+	{
+		Matrix transmat = Matrix::CreateTranslation(20.0f * ((i / 10) + 1), 0.0f, 0.0f);
+		Matrix rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(36.0f * i + (count / -10.0f)));
+		if (i < 10)
+		{
+			rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(36.0f * i + (count / 10.0f)));
+		}
+		
+		m_worldBall = transmat * rotmatZ;
+
+		m_model_ball[i]->Draw(m_d3dContext.Get(), *m_states, m_worldBall, m_view, m_proj);
+	}
+
+	//åœ°é¢ã®æç”»
+	for (int i = 0; i < GROUND_NUM; i++)
+	{
+		Matrix transmat = Matrix::CreateTranslation(i % 200 - 60.0f, i / 200 - 60.0f, 0.0f );
+		Matrix rotmatX = Matrix::CreateRotationX(XMConvertToRadians(90.0f));
+		m_worldGround = rotmatX * transmat;
+
+		m_model_ground[i]->Draw(m_d3dContext.Get(), *m_states, m_worldGround, m_view, m_proj);
+	}
 
 	m_batch->Begin();
 	m_batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
@@ -254,8 +317,8 @@ void Game::GetDefaultSize(int& width, int& height) const
 }
 
 // These are the resources that depend on the device.
-//ƒfƒoƒCƒX‚ğì‚Á‚Ä‚¢‚é
-//ƒfƒoƒCƒXDirectX‚Å‚Ì”‹@”\‚Åg‚¤‚à‚Ì
+//ãƒ‡ãƒã‚¤ã‚¹ã‚’ä½œã£ã¦ã„ã‚‹
+//ãƒ‡ãƒã‚¤ã‚¹ï¼DirectXã§ã®è«¸æ©Ÿèƒ½ã§ä½¿ã†ã‚‚ã®
 void Game::CreateDevice()
 {
     UINT creationFlags = 0;
@@ -340,7 +403,7 @@ void Game::CreateDevice()
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
-//•`‰ææ‚ÌƒLƒƒƒ“ƒoƒX‚ğì‚Á‚Ä‚¢‚é(ƒCƒ[ƒW)
+//æç”»å…ˆã®ã‚­ãƒ£ãƒ³ãƒã‚¹ã‚’ä½œã£ã¦ã„ã‚‹(ã‚¤ãƒ¡ãƒ¼ã‚¸)
 void Game::CreateResources()
 {
     // Clear the previous window size specific context.
