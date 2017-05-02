@@ -4,6 +4,7 @@
 
 #include "pch.h"
 #include "Game.h"
+#include "ctime"
 
 
 extern void ExitGame();
@@ -26,6 +27,8 @@ Game::Game() :
 // Initialize the Direct3D resources required to run.
 void Game::Initialize(HWND window, int width, int height)
 {
+	srand(static_cast<unsigned int> (time(nullptr)));
+
     m_window = window;
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
@@ -71,19 +74,39 @@ void Game::Initialize(HWND window, int width, int height)
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
 	m_factory->SetDirectory(L"Resources");	//テクスチャのパスを指定(フォルダ名を指定)
 	//モデルの生成(引数は　デバイス、読み込むcmo、エフェクトファクトリ(実体))
-	for (int i = 0; i < GROUND_NUM; i++)
-	{
-		m_model_ground[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_1m.cmo", *m_factory);
-	}
+	m_model_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_200m.cmo", *m_factory);
+
 	m_model_skydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\skydome.cmo", *m_factory);
 	for (int i = 0; i < BALL_NUM; i++)
 	{
 		m_model_ball[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ball.cmo", *m_factory);
 	}
 
+	for (int i = 0; i < POT_NUM; i++)
+	{
+		m_model_pot[i] = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\tea_pot.cmo", *m_factory);
+	}
+
 	m_worldBall = Matrix::Identity;
+	//ポットの初期位置設定
+	for (int i = 0; i < POT_NUM; i++)
+	{
+		float pot_degX = static_cast<float>(rand() % 360);
+		float pot_degZ = static_cast<float>(rand() % 360);
+		float pot_desX = static_cast<float>(rand() % SKY_RUD);
+		float pot_desZ = static_cast<float>(rand() % SKY_RUD);
+
+		Matrix transmat = Matrix::CreateTranslation(cos(XMConvertToRadians(pot_degX)) * pot_desX, 0.0f, sin(XMConvertToRadians(pot_degZ)) * pot_desZ);
+		pot_pos[i].x = cos(XMConvertToRadians(pot_degX)) * pot_desX;
+		pot_pos[i].z = sin(XMConvertToRadians(pot_degZ)) * pot_desZ;
+		pot_pos[i].y = 0.0f;
+
+		m_transmat[i] = transmat;
+	}
 
 	count = 0;
+	m_timestep = 0;
+	m_movetime = 0;
 }
 
 // Executes the basic game loop.
@@ -107,10 +130,45 @@ void Game::Update(DX::StepTimer const& timer)
     elapsedTime;
 	//毎フレーム処理を書く
 	count++;
+	m_movetime++;
+	m_timestep = m_movetime / 600.0f;
+	if (m_timestep > 1.0f)
+	{
+		m_timestep = 1.0f;
+	}
 
 	if (count > COUNT_NUM)
 	{
 		count = 0;
+	}
+
+	//ポットの描画
+	for (int i = 0; i < POT_NUM; i++)
+	{
+		//float deg = rand() % 360;
+		//float pot_degZ = rand() % 360;
+		//float pot_desX = rand() % SKY_RUD;
+		//float pot_desZ = rand() % SKY_RUD;
+
+		float val = (1.0f + sin(XMConvertToRadians(count % 360))) * 2.0f + 1.0f;
+
+		//Matrix transmat = Matrix::CreateTranslation(XMConvertToRadians(pot_degX) + pot_desX, 0.0f, XMConvertToRadians(pot_degZ) + pot_desZ);
+		Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(count % 360));
+		Matrix scale = Matrix::CreateScale(val);
+		m_transmat[i] = Matrix::CreateTranslation((1 - m_timestep) * pot_pos[i].x, 0.0f, (1 - m_timestep) * pot_pos[i].z);
+		// 線形補間用関数
+		/*static Vector3 Lerp(Vector3 startPosition, Vector3 targetPosition, float t)
+		{
+		Vector3 lerpPosition = Vector3.zero;
+
+		lerpPosition = (1 - t) * startPosition + t * targetPosition;
+
+		return lerpPosition;
+		}*/
+
+		m_worldPot[i] = rotmatY * scale * m_transmat[i];
+
+		//m_model_pot[i]->Draw(m_d3dContext.Get(), *m_states, m_worldPot[i], m_view, m_proj);
 	}
 
 	m_debug_camera->Update();
@@ -183,7 +241,7 @@ void Game::Render()
 		XM_PI / 4.f,		//視野角(上下方向)	(カメラの直線からの角度)
 		float(m_outputWidth) / float(m_outputHeight),	//アスペクト比
 		0.1f,			//ニアクリップ		-> 描画する範囲(カメラからの距離)
-		200.0f);			//ファークリップ	-> 描画する範囲(カメラからの距離)
+		500.0f);			//ファークリップ	-> 描画する範囲(カメラからの距離)
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);
@@ -194,10 +252,10 @@ void Game::Render()
 	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
 
 	//モデルの描画(引数は　コンテキスト、コモンステート(実体)、ワールド行列、ビュー行列、射影行列)
-	//m_model_ground->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
-	//m_model_skydome->Draw(m_d3dContext.Get(), *m_states, m_world, m_view, m_proj);
+	m_model_ground->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
+	m_model_skydome->Draw(m_d3dContext.Get(), *m_states, Matrix::Identity, m_view, m_proj);
 	//ボールの描画
-	for (int i = 0; i < BALL_NUM; i++)
+	/*for (int i = 0; i < BALL_NUM; i++)
 	{
 		Matrix transmat = Matrix::CreateTranslation(20.0f * ((i / 10) + 1), 0.0f, 0.0f);
 		Matrix rotmatZ = Matrix::CreateRotationZ(XMConvertToRadians(36.0f * i + (count / -10.0f)));
@@ -209,17 +267,13 @@ void Game::Render()
 		m_worldBall = transmat * rotmatZ;
 
 		m_model_ball[i]->Draw(m_d3dContext.Get(), *m_states, m_worldBall, m_view, m_proj);
-	}
-
-	//地面の描画
-	for (int i = 0; i < GROUND_NUM; i++)
+	}*/
+	//ポットの描画
+	for (int i = 0; i < POT_NUM; i++)
 	{
-		Matrix transmat = Matrix::CreateTranslation(i % 200 - 60.0f, i / 200 - 60.0f, 0.0f );
-		Matrix rotmatX = Matrix::CreateRotationX(XMConvertToRadians(90.0f));
-		m_worldGround = rotmatX * transmat;
-
-		m_model_ground[i]->Draw(m_d3dContext.Get(), *m_states, m_worldGround, m_view, m_proj);
+		m_model_pot[i]->Draw(m_d3dContext.Get(), *m_states,m_worldPot[i], m_view, m_proj);
 	}
+
 
 	m_batch->Begin();
 	m_batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);

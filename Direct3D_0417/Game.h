@@ -20,6 +20,9 @@ class Game
 {
 public:
 
+	static const int POT_NUM = 20;
+	const int SKY_RUD = 100;
+
     Game();
 
     // Initialization and management
@@ -42,6 +45,7 @@ private:
 	const int BALL_NUM = 20;
 	const int GROUND_NUM = 40000;
 	const int COUNT_NUM = 360 * 60;
+
 
 
     void Update(DX::StepTimer const& timer);
@@ -100,16 +104,22 @@ private:
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 
 	//地面モデル
-	std::unique_ptr<DirectX::Model> m_model_ground[40000];
+	std::unique_ptr<DirectX::Model> m_model_ground;
 	//天球モデル
 	std::unique_ptr<DirectX::Model> m_model_skydome;
 	//ボールモデル
 	std::unique_ptr<DirectX::Model> m_model_ball[20];
+	//ポットモデル
+	std::unique_ptr<DirectX::Model> m_model_pot[Game::POT_NUM];
 	//球のワールド行列
 	DirectX::SimpleMath::Matrix m_worldBall;
+	DirectX::SimpleMath::Matrix m_worldPot[POT_NUM];
+	DirectX::SimpleMath::Matrix m_transmat[POT_NUM];
 	DirectX::SimpleMath::Matrix m_worldGround;
 
 	int count;
-
+	float m_movetime;
+	float m_timestep;
+	DirectX::SimpleMath::Vector3 pot_pos[POT_NUM];
 	
 };
