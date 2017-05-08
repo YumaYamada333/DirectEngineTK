@@ -11,6 +11,7 @@
 #include <CommonStates.h>		//コモンステイとを使うためのヘッダ
 #include <SimpleMath.h>			//Vector,Colorを使うためのヘッダ
 #include <Model.h>				//モデルを表示するためのヘッダ
+#include <Keyboard.h>			//キーボードヘッダ
 #include "DebugCamera.h"
 
 
@@ -75,6 +76,10 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView>  m_renderTargetView;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView>  m_depthStencilView;
 
+	//キーボード
+	std::unique_ptr<DirectX::Keyboard> m_keyboard;
+
+
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
 
@@ -111,11 +116,17 @@ private:
 	std::unique_ptr<DirectX::Model> m_model_ball[20];
 	//ポットモデル
 	std::unique_ptr<DirectX::Model> m_model_pot[Game::POT_NUM];
+	//頭モデル
+	std::unique_ptr<DirectX::Model> m_model_head;
 	//球のワールド行列
 	DirectX::SimpleMath::Matrix m_worldBall;
 	DirectX::SimpleMath::Matrix m_worldPot[POT_NUM];
 	DirectX::SimpleMath::Matrix m_transmat[POT_NUM];
 	DirectX::SimpleMath::Matrix m_worldGround;
+	//頭の位置
+	DirectX::SimpleMath::Vector3 m_head_pos;
+	float m_head_deg;
+	DirectX::SimpleMath::Matrix m_head_world;
 
 	int count;
 	float m_movetime;

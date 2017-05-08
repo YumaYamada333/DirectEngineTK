@@ -33,6 +33,9 @@ void Game::Initialize(HWND window, int width, int height)
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
 
+	//キーボードの生成
+	m_keyboard = std::make_unique<Keyboard>();
+
     CreateDevice();
 
     CreateResources();
@@ -75,6 +78,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_factory->SetDirectory(L"Resources");	//テクスチャのパスを指定(フォルダ名を指定)
 	//モデルの生成(引数は　デバイス、読み込むcmo、エフェクトファクトリ(実体))
 	m_model_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_200m.cmo", *m_factory);
+	m_model_head = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\Head.cmo", *m_factory);
 
 	m_model_skydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\skydome.cmo", *m_factory);
 	for (int i = 0; i < BALL_NUM; i++)
@@ -104,6 +108,7 @@ void Game::Initialize(HWND window, int width, int height)
 		m_transmat[i] = transmat;
 	}
 
+	m_head_deg = 0.0f;
 	count = 0;
 	m_timestep = 0;
 	m_movetime = 0;
@@ -129,6 +134,8 @@ void Game::Update(DX::StepTimer const& timer)
     // TODO: Add your game logic here.
     elapsedTime;
 	//毎フレーム処理を書く
+	auto key = m_keyboard->GetState();	//キーボードの状態取得
+
 	count++;
 	m_movetime++;
 	m_timestep = m_movetime / 600.0f;
@@ -142,7 +149,7 @@ void Game::Update(DX::StepTimer const& timer)
 		count = 0;
 	}
 
-	//ポットの描画
+	//ポットの位置を更新
 	for (int i = 0; i < POT_NUM; i++)
 	{
 		//float deg = rand() % 360;
@@ -156,22 +163,50 @@ void Game::Update(DX::StepTimer const& timer)
 		Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(count % 360));
 		Matrix scale = Matrix::CreateScale(val);
 		m_transmat[i] = Matrix::CreateTranslation((1 - m_timestep) * pot_pos[i].x, 0.0f, (1 - m_timestep) * pot_pos[i].z);
-		// 線形補間用関数
-		/*static Vector3 Lerp(Vector3 startPosition, Vector3 targetPosition, float t)
-		{
-		Vector3 lerpPosition = Vector3.zero;
-
-		lerpPosition = (1 - t) * startPosition + t * targetPosition;
-
-		return lerpPosition;
-		}*/
 
 		m_worldPot[i] = rotmatY * scale * m_transmat[i];
-
-		//m_model_pot[i]->Draw(m_d3dContext.Get(), *m_states, m_worldPot[i], m_view, m_proj);
 	}
 
 	m_debug_camera->Update();
+
+	//キーボード操作
+
+	//Aキーで左旋回
+	if (key.A)
+	{
+		//旋回
+		m_head_deg++;
+	}
+	//Dキーで右旋回
+	if (key.D)
+	{
+		//旋回
+		m_head_deg--;
+	}
+
+	//自機のワールド行列を計算(回転)
+	Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(m_head_deg));
+
+	//Wキーで前進
+	if (key.W)
+	{
+		//移動ベクトル(Z座標前進)
+		Vector3 moveV(0, 0, -0.1f);
+		//自機の座標を移動(回転角から移動量を計算)
+		m_head_pos += SimpleMath::Vector3::TransformNormal(moveV, rotmatY);
+	}
+	//Sキーで後退
+	if (key.S)
+	{
+		//移動ベクトル(Z座標後退)
+		Vector3 moveV(0, 0, 0.1f);
+		//自機の座標を移動(回転角から移動量を計算)
+		m_head_pos += SimpleMath::Vector3::TransformNormal(moveV, rotmatY);
+	}
+
+	//ワールド行列を計算(回転 * 移動)
+	Matrix transmat = Matrix::CreateTranslation(m_head_pos);
+	m_head_world = rotmatY * transmat;
 
 	//ワールド行列を計算
 	////スケーリング
@@ -269,11 +304,13 @@ void Game::Render()
 		m_model_ball[i]->Draw(m_d3dContext.Get(), *m_states, m_worldBall, m_view, m_proj);
 	}*/
 	//ポットの描画
-	for (int i = 0; i < POT_NUM; i++)
+	/*for (int i = 0; i < POT_NUM; i++)
 	{
 		m_model_pot[i]->Draw(m_d3dContext.Get(), *m_states,m_worldPot[i], m_view, m_proj);
-	}
+	}*/
 
+	//自機の描画
+	m_model_head->Draw(m_d3dContext.Get(), *m_states, m_head_world, m_view, m_proj);
 
 	m_batch->Begin();
 	m_batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
