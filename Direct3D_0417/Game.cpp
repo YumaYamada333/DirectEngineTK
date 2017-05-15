@@ -72,6 +72,7 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//デバッグカメラを生成
 	m_debug_camera = std::make_unique<DebugCamera>(m_outputHeight, m_outputWidth);
+	m_camera = std::make_unique<FollowCamera>(static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
 
 	//エフェクトファクトリ生成
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
@@ -108,6 +109,7 @@ void Game::Initialize(HWND window, int width, int height)
 		m_transmat[i] = transmat;
 	}
 
+	m_head_pos = Vector3(0.0f, 0.0f, 30.0f);
 	m_head_deg = 0.0f;
 	count = 0;
 	m_timestep = 0;
@@ -167,7 +169,35 @@ void Game::Update(DX::StepTimer const& timer)
 		m_worldPot[i] = rotmatY * scale * m_transmat[i];
 	}
 
+
+
 	m_debug_camera->Update();
+
+	//カメラの更新
+	////時期に追従
+	//const float CAMERA_DISTANCE = 5.0f;
+	////視点、参照点
+	//Vector3 eyepos, refpos;
+	////参照点座標を計算
+	//refpos = m_head_pos + Vector3(0, 2, 0);
+	////自機からカメラ座標への差分
+	//Vector3 cameraV(0, 0, CAMERA_DISTANCE);
+	////自機の後ろに回り込むための回転行列
+	//Matrix rotmat = Matrix::CreateRotationY(XMConvertToRadians(m_head_deg));
+	////カメラへのベクトルを回転
+	//cameraV = Vector3::TransformNormal(cameraV, rotmat);
+	////カメラ座標を計算
+	//eyepos = refpos + cameraV;
+
+
+	//m_camera->SetEyePos(eyepos);
+	//m_camera->SetRefPos(refpos);
+	m_camera->SetTargetPos(m_head_pos);
+	m_camera->SetTargetAngle(m_head_deg);
+
+	m_camera->Update();
+	m_view = m_camera->GetViewMatrix();
+	m_proj = m_camera->GetProjMatrix();
 
 	//キーボード操作
 
@@ -270,13 +300,28 @@ void Game::Render()
 	//	Vector3(0.f, 0.f, 20.f),		//カメラの座標
 	//	Vector3::Zero,				//カメラの注視点
 	//	Vector3::UnitY);			//上方向ベクトル(画面の上方向がワールドのどこになるかを決定する)
-	m_view = m_debug_camera->GetCameraMatrix();
-	//プロジェクション行列を生成(遠近法を加味した画面の描画)
-	m_proj = Matrix::CreatePerspectiveFieldOfView(
-		XM_PI / 4.f,		//視野角(上下方向)	(カメラの直線からの角度)
-		float(m_outputWidth) / float(m_outputHeight),	//アスペクト比
-		0.1f,			//ニアクリップ		-> 描画する範囲(カメラからの距離)
-		500.0f);			//ファークリップ	-> 描画する範囲(カメラからの距離)
+	//m_view = m_debug_camera->GetCameraMatrix();
+	
+	//カメラの位置(視点座標)
+	//Vector3 eyepos(0.0f, 0.0f, 5.0f);
+	////カメラが見ている位置(注視点/参照点/注目点)
+	//Vector3 refpos(0.0f, 0.0f, 0.0f);
+	////カメラの上方向ベクトル(単位ベクトルのみ)(ななめの時は正規化する)
+	//Vector3 upvec(0.0f, 1.0f, 0.0f);
+	////ビュー行列の生成
+	//m_view = Matrix::CreateLookAt(eyepos, refpos, upvec);
+
+	//垂直方向視野角
+	//float forY = XMConvertToRadians(60.0f);
+	////アスペクト比
+	////ニアクリップ
+	////ファークリップ
+	////プロジェクション行列を生成(遠近法を加味した画面の描画)
+	//m_proj = Matrix::CreatePerspectiveFieldOfView(
+	//	XM_PI / 4.f,		//視野角(上下方向)	(カメラの直横str線からの角度)
+	//	float(m_outputWidth) / float(m_outputHeight),	//アスペクト比
+	//	0.1f,			//ニアクリップ		-> 描画する範囲(カメラからの距離)
+	//	500.0f);			//ファークリップ	-> 描画する範囲(カメラからの距離)
 
 	m_effect->SetView(m_view);
 	m_effect->SetProjection(m_proj);

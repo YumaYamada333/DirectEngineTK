@@ -13,6 +13,8 @@
 #include <Model.h>				//モデルを表示するためのヘッダ
 #include <Keyboard.h>			//キーボードヘッダ
 #include "DebugCamera.h"
+#include "Camera.h"
+#include "ForrowCamera.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -78,7 +80,7 @@ private:
 
 	//キーボード
 	std::unique_ptr<DirectX::Keyboard> m_keyboard;
-
+	std::unique_ptr<FollowCamera> m_camera;
 
     // Rendering loop timer.
     DX::StepTimer                                   m_timer;
