@@ -7,6 +7,7 @@
 #include "ctime"
 
 
+
 extern void ExitGame();
 
 using namespace DirectX;
@@ -33,9 +34,6 @@ void Game::Initialize(HWND window, int width, int height)
     m_outputWidth = std::max(width, 1);
     m_outputHeight = std::max(height, 1);
 
-	//キーボードの生成
-	m_keyboard = std::make_unique<Keyboard>();
-
     CreateDevice();
 
     CreateResources();
@@ -47,6 +45,15 @@ void Game::Initialize(HWND window, int width, int height)
     m_timer.SetTargetElapsedSeconds(1.0 / 60);
     */
 	//初期化はここに書く
+
+	//キーボードの生成
+	m_keyboard = std::make_unique<Keyboard>();
+	//カメラを生成
+	m_camera = std::make_unique<FollowCamera>(static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
+	m_camera->SetKeyboard(m_keyboard.get());
+	//３Dオブジェクトの静的メンバを初期化
+	Obj3D::InitializeStatic(m_d3dDevice, m_d3dContext, m_camera.get());
+
 	//引数としてそのままのポインタを要求されている場合、スマートポインタ.Get()と関数を呼び出すと隠されたポインタが返ってくる
 	m_batch = std::make_unique<PrimitiveBatch<VertexPositionNormal>>(m_d3dContext.Get());
 
@@ -72,7 +79,6 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//デバッグカメラを生成
 	m_debug_camera = std::make_unique<DebugCamera>(m_outputHeight, m_outputWidth);
-	m_camera = std::make_unique<FollowCamera>(static_cast<float>(m_outputWidth), static_cast<float>(m_outputHeight));
 
 	//エフェクトファクトリ生成
 	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
@@ -80,6 +86,7 @@ void Game::Initialize(HWND window, int width, int height)
 	//モデルの生成(引数は　デバイス、読み込むcmo、エフェクトファクトリ(実体))
 	m_model_ground = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\ground_200m.cmo", *m_factory);
 	m_model_head = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\Head.cmo", *m_factory);
+	m_obj.LoadModel(L"Resources\\Head.cmo");
 
 	m_model_skydome = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\skydome.cmo", *m_factory);
 	for (int i = 0; i < BALL_NUM; i++)
@@ -192,8 +199,8 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//m_camera->SetEyePos(eyepos);
 	//m_camera->SetRefPos(refpos);
-	m_camera->SetTargetPos(m_head_pos);
-	m_camera->SetTargetAngle(m_head_deg);
+	m_camera->SetTargetPos(/*m_obj.GetPosition()*/m_head_pos);
+	m_camera->SetTargetAngle(/*m_obj.GetRotate().y*/m_head_deg);
 
 	m_camera->Update();
 	m_view = m_camera->GetViewMatrix();
@@ -204,18 +211,26 @@ void Game::Update(DX::StepTimer const& timer)
 	//Aキーで左旋回
 	if (key.A)
 	{
-		//旋回
+		////回転ベクトル(Y軸回転)
+		//Vector3 Rot(0, 1, 0);
+		////旋回
+		//m_obj.SetRotate(Rot);
 		m_head_deg++;
 	}
 	//Dキーで右旋回
 	if (key.D)
 	{
-		//旋回
+		////回転ベクトル(Y軸回転)
+		//Vector3 Rot(0, -1, 0);
+		////旋回
+		//m_obj.SetRotate(Rot);
 		m_head_deg--;
 	}
 
 	//自機のワールド行列を計算(回転)
 	Matrix rotmatY = Matrix::CreateRotationY(XMConvertToRadians(m_head_deg));
+	//Matrix rotmatY2 = Matrix::CreateRotationY(XMConvertToRadians(m_head_deg));
+	Matrix rotmatY2 = Matrix::CreateRotationY(0);
 
 	//Wキーで前進
 	if (key.W)
@@ -236,7 +251,11 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//ワールド行列を計算(回転 * 移動)
 	Matrix transmat = Matrix::CreateTranslation(m_head_pos);
+	//Matrix transmat2 = Matrix::CreateTranslation(m_head_pos);
+	Matrix transmat2 = Matrix::CreateTranslation(Vector3(0, 0.5f, 0));
 	m_head_world = rotmatY * transmat;
+	//頭②のワールド行列を計算する(子供の行列＊親の行列)
+	m_head_world2 = rotmatY2 * transmat2 * rotmatY * transmat;
 
 	//ワールド行列を計算
 	////スケーリング
@@ -356,6 +375,7 @@ void Game::Render()
 
 	//自機の描画
 	m_model_head->Draw(m_d3dContext.Get(), *m_states, m_head_world, m_view, m_proj);
+	m_model_head->Draw(m_d3dContext.Get(), *m_states, m_head_world2, m_view, m_proj);
 
 	m_batch->Begin();
 	m_batch->DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);

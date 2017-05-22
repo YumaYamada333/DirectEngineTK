@@ -5,6 +5,9 @@
       <UniqueIdentifier>87d364d7-da42-4383-b0cf-6907df8dfbf1</UniqueIdentifier>
       <Extensions>ico;cur;bmp;dds;dlg;fbx;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tga;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Obj3D">
+      <UniqueIdentifier>{3508d3f9-6c04-4ad0-991e-16f4c9fa0973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -13,6 +16,9 @@
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ForrowCamera.h" />
+    <ClInclude Include="Obj3D.h">
+      <Filter>Obj3D</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -21,6 +27,9 @@
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ForrowCamera.cpp" />
+    <ClCompile Include="Obj3D.cpp">
+      <Filter>Obj3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

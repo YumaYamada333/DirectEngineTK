@@ -15,6 +15,7 @@
 #include "DebugCamera.h"
 #include "Camera.h"
 #include "ForrowCamera.h"
+#include "Obj3D.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -129,6 +130,15 @@ private:
 	DirectX::SimpleMath::Vector3 m_head_pos;
 	float m_head_deg;
 	DirectX::SimpleMath::Matrix m_head_world;
+	//頭②の位置
+	DirectX::SimpleMath::Vector3 m_head_pos2;
+	float m_head_deg2;
+	DirectX::SimpleMath::Matrix m_head_world2;
+
+	//3Dオブジェクト
+	Obj3D m_obj;
+
+	//std::vector<Obj3D> m_ObjPlayer;
 
 	int count;
 	float m_movetime;

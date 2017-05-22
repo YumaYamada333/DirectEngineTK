@@ -4,14 +4,14 @@
   Assets\Head.FBX
   Assets\skydome.FBX
   Assets\tea_pot.FBX
+  pch.cpp
   Main.cpp
   Game.cpp
 c:\users\s162193\desktop\directenginetk\direct3d_0417\game.cpp(57): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
 c:\users\s162193\desktop\directenginetk\direct3d_0417\game.cpp(162): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
 c:\users\s162193\desktop\directenginetk\direct3d_0417\game.cpp(165): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
   ForrowCamera.cpp
-  コードを生成中...
-  コンパイル中...
+  DebugCamera.cpp
   Camera.cpp
   コードを生成中...
      ライブラリ C:\Users\s162193\Desktop\DirectEngineTK\Debug\Direct3D_0417.lib とオブジェクト C:\Users\s162193\Desktop\DirectEngineTK\Debug\Direct3D_0417.exp を作成中
